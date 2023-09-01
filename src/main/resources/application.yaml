@@ -1,0 +1,30 @@
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+spring:
+  config:
+    additional-location: validation-messages/english.properties
+  h2:
+    console:
+      enabled: 'true'
+  datasource:
+    username: sa
+    url: jdbc:h2:mem:addressLookup
+    driverClassName: org.h2.Driver
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+server:
+  error:
+    include-binding-errors: always

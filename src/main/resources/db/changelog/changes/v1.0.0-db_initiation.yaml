@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-1
+      author: ljames
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: building
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: street
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: town
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: postcode
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+            tableName: address
+  - changeSet:
+      id: seedData-1
+      author: ljames
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: building
+                  name: building
+                  type: STRING
+              - column:
+                  header: street
+                  name: street
+                  type: STRING
+              - column:
+                  header: town
+                  name: town
+                  type: STRING
+              - column:
+                  header: postcode
+                  name: postcode
+                  type: STRING
+            file: classpath*:db/data/addresses.csv
+            tableName: address

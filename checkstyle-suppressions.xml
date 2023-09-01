@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN" "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+    <!-- Import ordering is frustrating to manage sometimes in the 
+        exact way google likes, but suppressing instead of deleting 
+        incase people case -->
+    <suppress checks="CustomImportOrder" files=".*" />
+    <!-- Suppress some checks in test code -->
+    <suppress checks="EmptyBlock" files=".*[\\/]src[\\/]test[\\/]" />
+    <suppress checks="ImportControl" files=".*[\\/]src[\\/](test|it)[\\/]" />
+    <suppress checks="Javadoc" files=".*[\\/]src[\\/](test|it)[\\/]" />
+    <suppress checks="MagicNumber" files=".*[\\/]src[\\/](test|it)[\\/]" />
+    <suppress checks="AvoidStaticImport" files=".*[\\/]src[\\/](test|it)[\\/]" />
+    <suppress checks="MethodCount" files=".*[\\/]src[\\/](test|it)[\\/]" />
+</suppressions>
