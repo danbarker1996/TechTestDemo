@@ -161,7 +161,16 @@ public class AddressService {
 			}
 			
 			return addresses;
-		} catch (IOException | InterruptedException e) {
+    	} catch (IOException e) {
+    		/*
+    		 * As we know the error is intermittent with the blacklist service, we can call the compareToBlacklist method
+    		 * recursively - it will have an escape when the request is successful.
+    		 */
+    		logger.error("Error trying to get blacklist, retrying...");
+    		return compareToBlacklist(addresses);
+    		
+    	} catch (InterruptedException e) {
+    		logger.error("Error trying to read blacklist, throwing exception");
 			throw new CouldNotReadBlacklistException();
 		}
     }
