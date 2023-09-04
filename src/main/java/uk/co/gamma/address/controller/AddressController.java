@@ -43,7 +43,7 @@ public class AddressController {
     @ApiResponse(responseCode = "200", description = "Returns list of all addresses", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Address.class))))
     @GetMapping
     public List<Address> list(@RequestParam(value = "postcode", required = false) String postcode,
-    		@RequestParam(value = "excludeInvalidPostCodes") boolean excludeInvalidPostcodes) {
+    		@RequestParam(value = "excludeInvalidPostcodes") boolean excludeInvalidPostcodes) {
         if (StringUtils.isNotBlank(postcode)) {
             return addressService.getByPostcode(postcode, excludeInvalidPostcodes);
         }

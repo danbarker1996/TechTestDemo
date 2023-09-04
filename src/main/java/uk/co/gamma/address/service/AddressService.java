@@ -61,6 +61,7 @@ public class AddressService {
      * getByPostcode find Addresses by their postcode.
 
      * @param postcode the postcode to search by.
+     * @param excludeInvalidPostcodes boolean to remove blacklisted addresses
 
      * @return List of  {@link Address}. Empty list if not found.
      */
@@ -146,7 +147,8 @@ public class AddressService {
      * compare a list of addresses to blacklisted postcodes, and remove ones that match
      * 
      * @param list of addresses to compare to blacklist
-     * @return
+     
+     * @return list of addresses excluding any blacklisted postcodes
      * 
      * @exception CouldNotReadBlacklistException
      */

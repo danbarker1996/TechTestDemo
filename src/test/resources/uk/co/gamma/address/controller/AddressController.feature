@@ -7,11 +7,24 @@ Feature: Create and Query Addresses via REST API
       | King's House  | Kings Road West | Newbury    | RG14 5BY |
       | The Malthouse | Elevator Road   | Manchester | M17 1BR  |
       | Holland House | Bury Street     | London     | EC3A 5AW |
-    When user asks for all addresses
+    When user asks for all addresses with exclude blacklist flag set to "false"
     Then user receives status code of 200
     And collection of addresses returned
       | building      | street          | town       | postcode |
       | King's House  | Kings Road West | Newbury    | RG14 5BY |
+      | The Malthouse | Elevator Road   | Manchester | M17 1BR  |
+      | Holland House | Bury Street     | London     | EC3A 5AW |
+      
+  Scenario: GET the list of all addresses excluding blacklisted postcodes
+    Given the collection of addresses
+      | building          | street             | town       | postcode |
+      | Deepdale Stadium  | Sir Tom Finney Way | Preston    | RG14 7DH |
+      | The Malthouse     | Elevator Road      | Manchester | M17 1BR  |
+      | Holland House     | Bury Street        | London     | EC3A 5AW |
+    When user asks for all addresses with exclude blacklist flag set to "true"
+    Then user receives status code of 200
+    And collection of addresses returned
+      | building      | street          | town       | postcode |
       | The Malthouse | Elevator Road   | Manchester | M17 1BR  |
       | Holland House | Bury Street     | London     | EC3A 5AW |
 
@@ -22,12 +35,20 @@ Feature: Create and Query Addresses via REST API
       | Queen's House | Kings Road West | Newbury    | RG14 5BY |
       | The Malthouse | Elevator Road   | Manchester | M17 1BR  |
       | Holland House | Bury Street     | London     | EC3A 5AW |
-    When user asks for all addresses with postcode "RG14 5BY"
+    When user asks for all addresses with postcode "RG14 5BY" and with exclude blacklist flag set to "false"
     Then user receives status code of 200
     And collection of addresses returned
       | building      | street          | town    | postcode |
       | King's House  | Kings Road West | Newbury | RG14 5BY |
       | Queen's House | Kings Road West | Newbury | RG14 5BY |
+      
+  Scenario: GET the list of all addresses by postcode, postcode is blacklisted
+    Given the collection of addresses
+      | building          | street             | town       | postcode |
+      | Deepdale Stadium  | Sir Tom Finney Way | Preston    | RG14 7DH |
+    When user asks for all addresses with postcode "RG14 7DH" and with exclude blacklist flag set to "true"
+    Then user receives status code of 200
+    And collection of addresses returned is empty
 
   Scenario: GET an address by ID
     Given the collection of addresses
@@ -77,7 +98,7 @@ Feature: Create and Query Addresses via REST API
       | building      | street          | town    | postcode |
       | Queen's House | Kings Road West | Newbury | RG14 5BY |
     Then user receives status code of 200
-    When user asks for all addresses
+    When user asks for all addresses with exclude blacklist flag set to "false"
     Then user receives status code of 200
     And collection of addresses returned
       | building      | street          | town       | postcode |
@@ -104,7 +125,7 @@ Feature: Create and Query Addresses via REST API
       | Holland House | Bury Street     | London     | EC3A 5AW |
     When user deletes the address with the latest ID
     Then user receives status code of 204
-    When user asks for all addresses
+    When user asks for all addresses with exclude blacklist flag set to "false"
     Then user receives status code of 200
     And collection of addresses returned
       | building      | street          | town       | postcode |
