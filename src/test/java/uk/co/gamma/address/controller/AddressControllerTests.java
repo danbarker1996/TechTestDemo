@@ -34,9 +34,9 @@ class AddressControllerTests {
     @Test
     void list_when_noAddresses_then_returnEmptyList() {
 
-        given(addressService.getAll()).willReturn(List.of());
+        given(addressService.getAll(false)).willReturn(List.of());
 
-        List<Address> response = addressController.list(null);
+        List<Address> response = addressController.list(null, false);
 
         then(response).isEmpty();
     }
@@ -51,13 +51,13 @@ class AddressControllerTests {
                 new Address(3, "Holland House", "Bury Street", "London", "EC3A 5AW")
         );
 
-        given(addressService.getAll()).willReturn(expected);
+        given(addressService.getAll(false)).willReturn(expected);
 
-        List<Address> actual = addressController.list(null);
+        List<Address> actual = addressController.list(null, false);
 
         then(actual).containsExactlyElementsOf(expected);
     }
-
+    
     @DisplayName("list(postcode) - Given addresses are present with postcode, then the matching list is returned")
     @Test
     void list_when_matchingAddresses_then_matchingAddressesReturned() {
@@ -66,9 +66,9 @@ class AddressControllerTests {
                 new Address(1, "King's House", "Kings Road West", "Newbury", "RG14 5BY")
         );
 
-        given(addressService.getByPostcode("RG14 5BY")).willReturn(expected);
+        given(addressService.getByPostcode("RG14 5BY", false)).willReturn(expected);
 
-        List<Address> actual = addressController.list("RG14 5BY");
+        List<Address> actual = addressController.list("RG14 5BY", false);
 
         then(actual).containsExactlyElementsOf(expected);
     }
