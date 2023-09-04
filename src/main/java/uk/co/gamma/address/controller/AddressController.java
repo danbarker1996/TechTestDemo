@@ -42,11 +42,12 @@ public class AddressController {
 
     @ApiResponse(responseCode = "200", description = "Returns list of all addresses", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Address.class))))
     @GetMapping
-    public List<Address> list(@RequestParam(value = "postcode", required = false) String postcode) {
+    public List<Address> list(@RequestParam(value = "postcode", required = false) String postcode,
+    		@RequestParam(value = "excludeInvalidPostcodes") boolean excludeInvalidPostcodes) {
         if (StringUtils.isNotBlank(postcode)) {
-            return addressService.getByPostcode(postcode);
+            return addressService.getByPostcode(postcode, excludeInvalidPostcodes);
         }
-        return addressService.getAll();
+        return addressService.getAll(excludeInvalidPostcodes);
     }
 
     @ApiResponse(responseCode = "200", description = "Address returned", content = @Content(schema = @Schema(implementation = Address.class)))

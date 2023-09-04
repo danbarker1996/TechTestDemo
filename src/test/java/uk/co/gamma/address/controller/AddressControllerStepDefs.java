@@ -3,6 +3,7 @@ package uk.co.gamma.address.controller;
 import static org.assertj.core.api.BDDAssertions.then;
 
 import io.cucumber.java.After;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -40,14 +41,16 @@ public class AddressControllerStepDefs {
         latestAddressId = addressRepository.saveAll(addresses).stream().mapToInt(AddressEntity::getId).max().orElse(0);
     }
 
-    @When("user asks for all addresses")
-    public void getAllAddresses() {
-        latestResponse = restTemplate.getForEntity(baseUrl, Address[].class);
+    @When("user asks for all addresses with exclude blacklist flag set to {string}")
+    public void getAllAddresses(String excludeBlackList) {
+    	String excludeBlacklistUrl = String.format("?excludeInvalidPostcodes=%s", excludeBlackList);
+        latestResponse = restTemplate.getForEntity(baseUrl.concat(excludeBlacklistUrl), Address[].class);
     }
 
-    @When("user asks for all addresses with postcode {string}")
-    public void getAddressesByPostcode(String postcode) {
-        latestResponse = restTemplate.exchange(baseUrl.concat("?postcode={postcode}"), HttpMethod.GET, null, Address[].class, postcode);
+    @When("user asks for all addresses with postcode {string} and with exclude blacklist flag set to {string}")
+    public void getAddressesByPostcode(String postcode, String excludeBlackList) {
+    	String requestParams = String.format("?postcode=%s&excludeInvalidPostcodes=%s", postcode, excludeBlackList);
+        latestResponse = restTemplate.exchange(baseUrl.concat(requestParams), HttpMethod.GET, null, Address[].class, postcode);
     }
 
     @When("user asks for the address with the latest ID")
@@ -86,7 +89,7 @@ public class AddressControllerStepDefs {
     public void deleteInvalidAddress() {
         latestResponse = restTemplate.exchange(baseUrl.concat("/" + (latestAddressId + 1)), HttpMethod.DELETE, null, Void.class);
     }
-
+   
     @Then("user receives status code of {int}")
     public void clientReceivesStatusCode(int code) {
         then(latestResponse.getStatusCodeValue()).isEqualTo(code);
@@ -98,6 +101,14 @@ public class AddressControllerStepDefs {
 
         then(actual).isInstanceOf(Address[].class);
         then((Address[]) actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id").containsAll(expected);
+    }
+    
+    @Then("collection of addresses returned is empty")
+    public void assertAddressesEmpty() {
+    	Object actual = latestResponse.getBody();
+    	
+    	then(actual).isInstanceOf(Address[].class);
+    	then((Address[]) actual).isNullOrEmpty();
     }
 
     @Then("address returned")

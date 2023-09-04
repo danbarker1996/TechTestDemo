@@ -1,5 +1,6 @@
 package uk.co.gamma.address.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -7,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.gamma.address.exception.AddressNotFoundException;
+import uk.co.gamma.address.exception.CouldNotReadBlacklistException;
 import uk.co.gamma.address.model.Address;
+import uk.co.gamma.address.model.Zone;
 import uk.co.gamma.address.model.db.entity.AddressEntity;
 import uk.co.gamma.address.model.db.repository.AddressRepository;
 import uk.co.gamma.address.model.mapper.AddressMapper;
@@ -22,37 +25,54 @@ public class AddressService {
 
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
+    private final BlackListService blackListService;
 
     /**
      * Constructor.
 
      * @param addressRepository  {@link AddressRepository}.
      * @param addressMapper  {@link AddressMapper}
+     * @param blackListService  {@link blackListService}
      */
     @Autowired
-    AddressService(AddressRepository addressRepository, AddressMapper addressMapper) {
+    AddressService(AddressRepository addressRepository, AddressMapper addressMapper, BlackListService blackListService) {
         this.addressRepository = addressRepository;
         this.addressMapper = addressMapper;
+        this.blackListService = blackListService;
     }
 
     /**
      * getAll get all the addresses of the system.
+     * 
+     * @param excludeInvalidPostcodes boolean to remove blacklisted addresses
 
      * @return List  {@link Address} . Empty if none found.
      */
-    public List<Address> getAll() {
-        return addressMapper.entityToModel(addressRepository.findAll());
+    public List<Address> getAll(boolean excludeInvalidPostcodes) {
+    	List<Address> addressList = addressMapper.entityToModel(addressRepository.findAll());
+    	if (excludeInvalidPostcodes) {
+    		return compareToBlacklist(addressList);
+    	}
+    	
+        return addressList;
     }
-
+    
     /**
      * getByPostcode find Addresses by their postcode.
 
      * @param postcode the postcode to search by.
+     * @param excludeInvalidPostcodes boolean to remove blacklisted addresses
 
      * @return List of  {@link Address}. Empty list if not found.
      */
-    public List<Address> getByPostcode(String postcode) {
-        return addressMapper.entityToModel(addressRepository.findByPostcode(postcode));
+    public List<Address> getByPostcode(String postcode, boolean excludeInvalidPostcodes) {
+    	List<Address> addresses = addressMapper.entityToModel(addressRepository.findByPostcode(postcode));
+    	
+    	if (excludeInvalidPostcodes) {
+    		return compareToBlacklist(addresses);
+    	}
+    	
+        return addresses;
     }
 
     /**
@@ -121,5 +141,28 @@ public class AddressService {
      */
     private Address save(AddressEntity addressEntity) {
         return addressMapper.entityToModel(addressRepository.save(addressEntity));
+    }
+    
+    /**
+     * compare a list of addresses to blacklisted postcodes, and remove ones that match
+     * 
+     * @param list of addresses to compare to blacklist
+     
+     * @return list of addresses excluding any blacklisted postcodes
+     * 
+     * @exception CouldNotReadBlacklistException
+     */
+    private List<Address> compareToBlacklist(final List<Address> addresses) {
+    	try {
+			List<Zone> blacklistedZones = blackListService.getAll();
+			
+			for (Zone zone : blacklistedZones) {
+				addresses.removeIf(address -> address.postcode().equalsIgnoreCase(zone.getPostCode()));
+			}
+			
+			return addresses;
+		} catch (IOException | InterruptedException e) {
+			throw new CouldNotReadBlacklistException();
+		}
     }
 }
