@@ -32,12 +32,10 @@ import uk.co.gamma.address.service.BlackListService;
 public class AddressController {
 
     private final AddressService addressService;
-    private final BlackListService blackListService;
 
     @Autowired
-    public AddressController(AddressService addressService, BlackListService blackListService) {
+    public AddressController(AddressService addressService) {
         this.addressService = addressService;
-        this.blackListService = blackListService;
     }
 
     @ApiResponse(responseCode = "200", description = "Returns list of all addresses", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Address.class))))

@@ -1,0 +1,20 @@
+Task 3 - Improvements to Code
+
+1. Test code coverage is not 100%:
+
+  - Only getAll and getByPostcode methods are tested in AddressService. Tests are needed for getById, create, update, delete and save.
+
+2. REST controller tests don't cover failures for PUT, DELETE, and POST
+
+3. REST controller needs better error reporting. ResponseEntity would be a good idea as this can house the body, status code and any potential error message.
+
+4. Logging should be used throughout application to report when a request is received, process and succeeded/failed.
+
+5. Possibly include a blacklist flag on the Address object itself, to save the need for a call to a separate call that creates another point of failure.
+
+6. An endpoint could be created to add to the blacklist
+
+7. Another endpoint could be created to get addresses by their town, in case the need arises to look up all the deliveries in a certain town.
+
+
+  
